@@ -1,2 +1,0 @@
-https://geocoding.geo.census.gov/geocoder/geographies/addressbatch?form
-https://pypi.org/project/censusgeocode/
