@@ -21,7 +21,7 @@ start = int(input())
 path = os.path.dirname(sys.argv[0])
 
 # Check whether file 'branches_address.csv' exists
-if os.path.isfile(path+file) is True:
+if os.path.isfile(path+'/'+file) is True:
     print('file {} found!'.format(file))
 else:
     print('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
