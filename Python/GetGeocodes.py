@@ -18,10 +18,11 @@ start = int(input())
 # print('sys.argv[1] =', sys.argv[1])
 # print('path =', pathname)
 # print('full path =', os.path.abspath(pathname))
-path = os.path.dirname(sys.argv[0])
+path = os.path.dirname(sys.argv[0]) + '/'
+print('current path: {}'.format(path))
 
 # Check whether file 'branches_address.csv' exists
-if os.path.isfile(path+'/'+file) is True:
+if os.path.isfile(path+file) is True:
     print('file {} found!'.format(file))
 else:
     print('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
@@ -30,7 +31,7 @@ else:
 # set up folder name
 downloadfolder = strftime('{}_%d%m%Y_%H%M%S'.format(start), gmtime()) # folder naming convention: i_DDMMYY_HHMMSS
 # set up destination folder
-destinationpath = path + '/' + downloadfolder + '/'
+destinationpath = path + downloadfolder + '/'
 # make directory
 try:
     os.mkdir(destinationpath)
@@ -40,7 +41,10 @@ else:
     print('Successfully created the directory {}'.format(destinationpath))
 
 # Load data
-geodata = pd.DataFrame(pd.read_csv(path + '/' + file))
+try:
+    geodata = pd.DataFrame(pd.read_csv(path+file))
+except FileNotFoundError:
+    sys.exit('File not found!')
 
 # Get total size of dataset -1 for indexes
 n = geodata.size-1
