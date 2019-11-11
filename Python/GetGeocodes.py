@@ -20,11 +20,17 @@ start = int(input())
 # print('full path =', os.path.abspath(pathname))
 path = os.path.dirname(sys.argv[0])
 
+# Check whether file 'branches_address.csv' exists
+if os.path.isfile(path+file) is True:
+    print('file {} found!'.format(file))
+else:
+    print('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
+
 # Create a destination folder where the downloaded geo data will be saved to
 # set up folder name
 downloadfolder = strftime('{}_%d%m%Y_%H%M%S'.format(start), gmtime()) # folder naming convention: i_DDMMYY_HHMMSS
 # set up destination folder
-destinationpath = path + downloadfolder + '/'
+destinationpath = path + '/' + downloadfolder + '/'
 # make directory
 try:
     os.mkdir(destinationpath)
@@ -34,7 +40,7 @@ else:
     print('Successfully created the directory {}'.format(destinationpath))
 
 # Load data
-geodata = pd.DataFrame(pd.read_csv(path + file))
+geodata = pd.DataFrame(pd.read_csv(path + '/' + file))
 
 # Get total size of dataset -1 for indexes
 n = geodata.size-1
@@ -75,7 +81,7 @@ geodata['COUNTY'] = ''
 startingtime = time.time()
 
 # Info
-print('#######\tstart index: {}\n\t\tdestination folder: {}\n'.format(start, destinationpath))
+print('#######\tstart index: {}\n\tstart time: {}\n\tdestination folder: {}\n'.format(start, strftime('%H%M%S', gmtime()), destinationpath))
 
 for i in range(start, n):
 
@@ -142,7 +148,7 @@ for i in range(start, n):
 
             # Info
             print('\naddress {} reached, now exporting as branches_address_new_p{}.xlsx (.csv)'.format(i, part))
-            print('\nelapsed time: {}\n'.format(endingtime-startingtime))
+            print('\nelapsed time: {}\n'.format(round(endingtime-startingtime)))
 
             # Export data
             geodata.to_csv(destinationpath + 'branches_address_new_p{}.csv'.format(part), header=True)
