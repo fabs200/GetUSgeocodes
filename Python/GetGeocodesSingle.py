@@ -1,11 +1,21 @@
 import pandas as pd
 import censusgeocode as cg
+import timer
+import time
+import sys
 
 # search format: 453 Booth Street, Ottawa ON
 
-# Paths
-path = '/Users/Fabian/OneDrive/Projekt/GetUSgeocodes/'
+# path
+
 file = 'branches_address.csv'
+
+# #TODO: Specify location of folder where to save files
+#     for arg in sys.argv[1:]:
+#         print(arg)
+#
+# create folder
+# 12501_11112019_1122
 
 # Data
 geodata = pd.DataFrame(pd.read_csv(path + file))
@@ -45,20 +55,35 @@ geodata['MTFCC'] = ''
 geodata['LWBLKTYP'] = ''
 geodata['COUNTY'] = ''
 
+print('Enter a starting number, e.g. 12501')
+start = int(input())
+startingtime = time.time()
+
 # i=1
 # searchaddress = geodata['street'].iloc[i] + ' ' + geodata['city'].iloc[i] + ', ' + geodata['state'].iloc[i] + ' ' + str(geodata['zip'].iloc[i])
 
-for i in range(10001, n):
+for i in range(start, n):
 
     # Get address
     searchresult = cg.address(street=geodata['street'].iloc[i], city=geodata['city'].iloc[i], state=geodata['state'].iloc[i], zipcode=geodata['zip'].iloc[i])
 
     percentage = round((i/n), 5)
-    print('address {} downloading...\t{}% done'.format(i, percentage))
+    sys.stdout.write("\033[F") # Cursor up one line
+    print('address {} downloading...\t{} done'.format(i, percentage))
 
     # If address search result empty, continue to next, else, save info
     if searchresult is []:
-        continue
+
+        # Info
+        print('\t\n no results found! Retrying downloading ...')
+
+        # wait 3 sec and retry, if then still empty, continue
+        timer.sleep(3)
+        searchresult = cg.address(street=geodata['street'].iloc[i], city=geodata['city'].iloc[i], state=geodata['state'].iloc[i], zipcode=geodata['zip'].iloc[i])
+        
+        if searchresult is []:
+            print('\t\n no results found!')
+            continue
     else:
 
         # Save infos
@@ -92,14 +117,18 @@ for i in range(10001, n):
         except:
             pass
 
-        if (divmod(i, 10000)[1] == 0) & (i != 0):
+        if (divmod(i, 2500)[1] == 0) & (i != 0):
 
             # retrieve part
             part = divmod(i, 2500)[0]
 
+            # Time
+            endingtime = time.time()
+
             # Info
-            print('address {} reached, now exporting as branches_address_new_p{}.csv, .xlsx'.format(i, part))
+            print('\naddress {} reached, now exporting as branches_address_new_p{}.xlsx (.csv)'.format(i, part))
+            print('\nelapsed time: {}\n'.format(endingtime-startingtime))
 
             # Export data
-            geodata.to_csv(path + 'downloads/branches_address_new_p{}.csv'.format(part), index=None, header=True)
+            geodata.to_csv(path + 'downloads/branches_address_new_p{}.csv'.format(part), header=True)
             geodata.to_excel(path + 'downloads/branches_address_new_p{}.xlsx'.format(part), sheet_name='Geo Data', header=True)
