@@ -10,28 +10,27 @@ from time import gmtime, strftime
 # File with Addresses
 file = 'branches_address.csv'
 
-print('Enter a starting index number, e.g. 10001')
-start = int(input())
-
 # Get Path where this Script is located
 # print('sys.argv[0] =', sys.argv[0])
 # print('sys.argv[1] =', sys.argv[1])
 # print('path =', pathname)
 # print('full path =', os.path.abspath(pathname))
-path = os.path.dirname(sys.argv[0]) + '/'
-print('current path: {}'.format(path))
+path = os.path.dirname(sys.argv[0])
 
 # Check whether file 'branches_address.csv' exists
-if os.path.isfile(path+file) is True:
+if os.path.isfile(path+'/'+file) is True:
     print('file {} found!'.format(file))
 else:
-    print('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
+    sys.exit('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
+
+print('Enter a starting index number, e.g. 10001')
+start = int(input())
 
 # Create a destination folder where the downloaded geo data will be saved to
 # set up folder name
 downloadfolder = strftime('{}_%d%m%Y_%H%M%S'.format(start), gmtime()) # folder naming convention: i_DDMMYY_HHMMSS
 # set up destination folder
-destinationpath = path + downloadfolder + '/'
+destinationpath = path + '/' + downloadfolder + '/'
 # make directory
 try:
     os.mkdir(destinationpath)
@@ -41,10 +40,7 @@ else:
     print('Successfully created the directory {}'.format(destinationpath))
 
 # Load data
-try:
-    geodata = pd.DataFrame(pd.read_csv(path+file))
-except FileNotFoundError:
-    sys.exit('File not found!')
+geodata = pd.DataFrame(pd.read_csv(path + '/' + file))
 
 # Get total size of dataset -1 for indexes
 n = geodata.size-1
@@ -85,7 +81,7 @@ geodata['COUNTY'] = ''
 startingtime = time.time()
 
 # Info
-print('#######\tstart index: {}\n\tstart time: {}\n\tdestination folder: {}\n'.format(start, strftime('%H%M%S', gmtime()), destinationpath))
+print('#######\tstart index: {}\n#######\tstart time: {}\n#######\tdestination folder: {}\n'.format(start, strftime('%H%M%S', gmtime()), destinationpath))
 
 for i in range(start, n):
 
@@ -152,7 +148,7 @@ for i in range(start, n):
 
             # Info
             print('\naddress {} reached, now exporting as branches_address_new_p{}.xlsx (.csv)'.format(i, part))
-            print('\nelapsed time: {}\n'.format(round(endingtime-startingtime)))
+            print('\nelapsed time: {} seconds\n'.format(round(endingtime-startingtime)))
 
             # Export data
             geodata.to_csv(destinationpath + 'branches_address_new_p{}.csv'.format(part), header=True)
