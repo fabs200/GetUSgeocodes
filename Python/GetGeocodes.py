@@ -11,14 +11,10 @@ from time import gmtime, strftime
 file = 'branches_address.csv'
 
 # Get Path where this Script is located
-# print('sys.argv[0] =', sys.argv[0])
-# print('sys.argv[1] =', sys.argv[1])
-# print('path =', pathname)
-# print('full path =', os.path.abspath(pathname))
 path = os.path.dirname(sys.argv[0])
 
 # Check whether file 'branches_address.csv' exists
-if os.path.isfile(path+'/'+file) is True:
+if os.path.isfile(path + '/' + file) is True:
     print('file {} found!'.format(file))
 else:
     sys.exit('file {} not found! Make sure this Python Script is in the same directory as {} and retry.'.format(file, file))
@@ -42,8 +38,9 @@ else:
 # Load data
 geodata = pd.DataFrame(pd.read_csv(path + '/' + file))
 
-# Get total size of dataset -1 for indexes
-n = geodata.size-1
+# Get total size of dataset for indexes
+#n = geodata.shape[0]
+n = geodata.tail(1).index[0] + 1
 
 # Add Searchresult columns
 # matchedAddress
@@ -81,10 +78,10 @@ geodata['COUNTY'] = ''
 startingtime = time.time()
 
 # Info
-print('#######\tstart index: {}\n#######\tstart time: {}\n#######\tdestination folder: {}\n'.format(start, strftime('%H%M%S', gmtime()), destinationpath))
+print('#######\tstart index: {}\n#######\tstart time: {}\n#######\tdestination folder: {}\n'.format(start, strftime('%H%M', gmtime()), destinationpath))
 
 for i in range(start, n):
-
+    print(i, n)
     # Get address
     searchresult = cg.address(street=geodata['street'].iloc[i], city=geodata['city'].iloc[i], state=geodata['state'].iloc[i], zipcode=geodata['zip'].iloc[i])
 
@@ -153,3 +150,23 @@ for i in range(start, n):
             # Export data
             geodata.to_csv(destinationpath + 'branches_address_new_p{}.csv'.format(part), header=True)
             geodata.to_excel(destinationpath + 'branches_address_new_p{}.xlsx'.format(part), sheet_name='Geo Data', header=True)
+
+        if i == geodata.tail(1).index[0]:
+
+            # write final part
+            part = 'final_part'
+
+            # Time
+            endingtime = time.time()
+
+            # Info
+            print('\naddress {} reached, now exporting as branches_address_new_{}.xlsx (.csv)'.format(i, part))
+            print('\ntotal elapsed time: {} minutes\n'.format(round((endingtime-startingtime)/3600)))
+
+            # Export data
+            geodata.to_csv(destinationpath + 'branches_address_new_{}.csv'.format(part), header=True)
+            geodata.to_excel(destinationpath + 'branches_address_new_{}.xlsx'.format(part), sheet_name='Geo Data', header=True)
+
+            # finalize
+            print('final part saved as branches_address_new_{}.csv (.xlsx)'.format(part))
+            print('all done!')
